@@ -1,4 +1,4 @@
-' Author: admarty@github.com
+' Author: github.com/admarty
 
 ' This script dynamically checks Windows Defender's Tamper Protection status and guides users accordingly.
 ' If Tamper Protection is active, it prompts users to manually disable it and conveniently opens the Defender Threat settings window.
