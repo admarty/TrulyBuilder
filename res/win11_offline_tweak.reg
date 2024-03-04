@@ -1,0 +1,215 @@
+Windows Registry Editor Version 5.00
+
+; Disable "These files might be harmful to your computer" on domain 'pve.lab' when working with NAS
+[HKEY_LOCAL_MACHINE\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains\pve.lab]
+"*"=dword:00000001
+
+; Disable chat icon in taskbar
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\Windows Chat]
+"ChatIcon"=dword:00000003
+
+; Custom Start menu layout
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\PolicyManager\current\device\Start]
+"ConfigureStartPins"="{\"pinnedList\":[{\"packagedAppId\":\"windows.immersivecontrolpanel_cw5n1h2txyewy!microsoft.windows.immersivecontrolpanel\"},{\"desktopAppId\": \"Chrome\"}]}"
+
+; Prevents Microsoft Malicious Software Removal Tool from being offered through Windows Update
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\MRT]
+"DontOfferThroughWUAU"=dword:00000001
+
+; Microsoft accounts is optional for appx
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]
+"MSAOptional"=dword:00000001
+
+; Set Default Windows Terminal
+[HKEY_LOCAL_MACHINE\zNTUSER\Console\%%Startup]
+"DelegationConsole"="{2EACA947-7F5F-4CFA-BA87-8F7FBEEFBE69}"
+"DelegationTerminal"="{E12CFF52-A866-4C77-9A90-F570A7AA2C6B}"
+
+; Turn off Windows Error Reporting
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting]
+"Disabled"=dword:00000001
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\PCHealth\ErrorReporting]
+"DoReport"=dword:00000000
+
+; Enable link connection mapped drives for elevated process
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System]
+"EnableLinkedConnections"=dword:00000001
+
+; Hide Home page in Setting
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"SettingsPageVisibility"="hide:home"
+
+; Enable Exclusions paths
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows Defender\Exclusions]
+"Exclusions_Paths"=dword:00000001
+
+; Hide Ransomware data recovery area in Windows Security
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows Defender Security Center\Virus and threat protection]
+"HideRansomwareRecovery"=dword:00000001
+
+; Hide Account protection area in Windows Security
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows Defender Security Center\Account protection]
+"UILockdown"=dword:00000001
+
+; Taskbar Layout
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
+"LayoutXMLPath"="C:\\Windows\\OEM\\TaskbarLayout.xml"
+
+; Bypass the internet requirement on OOBE
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\OOBE]
+"BypassNRO"=dword:00000001
+
+; Do not turn off Wifi when connected to ethernet
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\WcmSvc\Local]
+"fMinimizeConnections"=dword:00000000
+
+; Disabling Reserved Storage
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager]
+"ShippedWithReserves"=dword:00000000
+"MiscPolicyInfo"=dword:00000002
+"PassedPolicy"=dword:00000000
+"ActiveScenario"=dword:00000000
+
+; Disable Online Tips and Help for Settings app
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"AllowOnlineTips"=dword:00000000
+
+; Disable Windows Security summary notifications
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows Defender Security Center\Virus and threat protection]
+"SummaryNotificationDisabled"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows Defender\Reporting]
+"DisableEnhancedNotifications"=dword:00000000
+
+; Tweak Microsoft Edge to make it behave like a good boy
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Edge]
+"NewTabPageAllowedBackgroundTypes"=dword:00000002
+"NewTabPageContentEnabled"=dword:00000000
+"NewTabPageQuickLinksEnabled"=dword:00000000
+"StartupBoostEnabled"=dword:00000000
+"HideFirstRunExperience"=dword:00000001
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\MicrosoftEdge\Main]
+"AllowPrelaunch"=dword:00000000
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Policies\Microsoft\MicrosoftEdge\Main]
+"AllowPrelaunch"=dword:00000000
+
+; Add Adguard Adblock extention to Chrome
+[HKEY_LOCAL_MACHINE\zSOFTWARE\WOW6432Node\Google\Chrome\Extensions\bgnkhhnnamicmpeenaelnjfhikgbkllg]
+"update_url"="https://clients2.google.com/service/update2/crx"
+
+; Turn off System Restore Point
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore]
+"RPSessionInterval"=dword:00000000
+
+; Hide useless WinRAR context menu
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\WinRAR\Setup\MenuItems]
+"EmailArc"=dword:00000000
+"EmailOpt"=dword:00000000
+
+; Do not display Recently Used Files and Frequent Used Folder in Quick Access
+[HKEY_LOCAL_MACHINE\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
+"ShowFrequent"=dword:00000000
+"ShowRecent"=dword:00000000
+
+; Prevent the addition of the prefix 'Shortcut' when creating a shortcut
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\Explorer]
+"Link"=hex:00,00,00,00
+
+; Tweak File Explorer
+[HKEY_LOCAL_MACHINE\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"LaunchTo"=dword:00000001
+"DisallowShaking"=dword:00000001
+"ShowTaskViewButton"=dword:00000000
+"MultiTaskingAltTabFilter"=dword:00000003
+
+; show This PC on the Desktop
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel]
+"{20D04FE0-3AEA-1069-A2D8-08002B30309D}"=dword:00000000
+
+; No Computers Near Me in Network Locations
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"NoComputersNearMe"=dword:00000001
+
+; Disable Activity history
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\System]
+"EnableActivityFeed"=dword:00000000
+"PublishUserActivities"=dword:00000000
+"UploadUserActivities"=dword:00000000
+
+; Disable Automatic Updates
+[-HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU]
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU]
+"NoAutoUpdate"=dword:00000001
+
+; Disable Delivery optimization
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization]
+"DODownloadMode"=dword:00000000
+
+; Disable Recommended Troubleshooting
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\WindowsMitigation]
+"UserPreference"=dword:00000001
+
+; Disable Telemetry
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\DataCollection]
+"DoNotShowFeedbackNotifications"=dword:00000001
+"AllowTelemetry"=dword:00000000
+"LimitEnhancedDiagnosticDataWindowsAnalytics"=dword:00000000
+
+; Disable Windows Customer Experience Improvement Program
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\SQMClient\Windows]
+"CEIPEnable"=dword:00000000
+
+; Disable Cortana
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\Windows Search]
+"AllowCortana"=dword:00000000
+
+; Disable web Search in Search box
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Policies\Microsoft\Windows\Explorer]
+"DisableSearchBoxSuggestions"=dword:00000001
+
+; Tweak Search icon
+[HKEY_LOCAL_MACHINE\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\Search]
+"SearchboxTaskbarMode"=dword:00000001
+"SearchboxTaskbarModeCache"=dword:00000001
+"SearchboxTaskbarModePrevious"=dword:00000002
+"OnboardSBEmode"=dword:00000001
+"OnboardSearchboxOnTaskbar"=dword:00000002
+
+; Enable Clipboard History
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Clipboard]
+"EnableClipboardHistory"=dword:00000001
+
+; Disable OneDriveSetup startup
+[-HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\Run]
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\Run]
+
+; Disable automatically installating suggested apps
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"SilentInstalledAppsEnabled"=dword:00000000
+
+; Disable Get suggestions when using Windows
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"SoftLandingEnabled"=dword:00000000
+
+; Disabling Sponsored Apps appx
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"PreInstalledAppsEnabled"=dword:00000000
+"OemPreInstalledAppsEnabled"=dword:00000000
+
+; Turn Off Start Menu suggestions
+[HKEY_LOCAL_MACHINE\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"SubscribedContent-338388Enabled"=dword:00000000
+
+; Turn off suggestions in Timeline and Settings
+[HKEY_LOCAL_MACHINE\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"SubscribedContent-353698Enabled"=dword:00000000
+"SubscribedContent-338393Enabled"=dword:00000000
+"SubscribedContent-353694Enabled"=dword:00000000
+"SubscribedContent-353696Enabled"=dword:00000000
+
+; Unattend stuff
+[HKEY_LOCAL_MACHINE\zSYSTEM\Setup]
+"UnattendFile"=hex(2):43,00,3a,00,5c,00,50,00,72,00,6f,00,67,00,72,00,61,00,6d,\
+  00,44,00,61,00,74,00,61,00,5c,00,61,00,75,00,64,00,69,00,74,00,5f,00,6d,00,\
+  6f,00,64,00,65,00,2e,00,78,00,6d,00,6c,00,00,00
+
