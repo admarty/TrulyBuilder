@@ -8,9 +8,17 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Windows\Windows Chat]
 "ChatIcon"=dword:00000003
 
+; Tweak Start menu
+[HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\Start]
+"VisiblePlaces"=hex:86,08,73,52,aa,51,43,42,9f,7b,27,76,58,46,59,d4
+"ShowRecentList"=dword:00000001
+"ShowFrequentList"=dword:00000000
+"PlacesInitializedVersion"=dword:00000002
+"Migrated"=dword:00000001
+
 ; Custom Start menu layout
 [HKEY_LOCAL_MACHINE\zSOFTWARE\Microsoft\PolicyManager\current\device\Start]
-"ConfigureStartPins"="{\"pinnedList\":[{\"packagedAppId\":\"windows.immersivecontrolpanel_cw5n1h2txyewy!microsoft.windows.immersivecontrolpanel\"},{\"desktopAppId\": \"Chrome\"}]}"
+"ConfigureStartPins"="{\"pinnedList\":[{\"desktopAppId\": \"Chrome\"}]}"
 
 ; Prevents Microsoft Malicious Software Removal Tool from being offered through Windows Update
 [HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\MRT]
@@ -115,9 +123,17 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\zNTUSER\Software\Microsoft\Windows\CurrentVersion\Explorer]
 "Link"=hex:00,00,00,00
 
+; Disable Widgets for all users
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Policies\Microsoft\Dsh]
+"AllowNewsAndInterests"=dword:00000000
+
 ; Tweak File Explorer
 [HKEY_LOCAL_MACHINE\zNTUSER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-"LaunchTo"=dword:00000001
+"LaunchTo"=dword:00000001	; open Explorer to This PC
+"TaskbarAl"=dword:00000000	; align the taskbar to the left
+"TaskbarDa"=dword:00000000	; turn off Widgets on taskbar
+"TaskbarSd"=dword:00000001	; enable Select the far corner of the taskbar to show the desktop
+"Start_TrackDocs"=dword:00000000	; Turn Off Show_recently_opened_items_in_Start
 "DisallowShaking"=dword:00000001
 "ShowTaskViewButton"=dword:00000000
 "MultiTaskingAltTabFilter"=dword:00000003
