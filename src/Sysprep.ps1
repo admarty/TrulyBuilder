@@ -15,6 +15,7 @@ if ($auditBoot -ne 0) {
             Repair-WindowsImage -Online -RestoreHealth | out-null
         } else {
             Write-Host 'No component store corruption detected.'
+            sleep 5
         }
     }
 
