@@ -78,6 +78,6 @@ if ($auditBoot -ne 0) {
 
 } else {
     Write-Host -b black -f yellow "This script is designed to run in audit mode only."
-    echo 'Press Enter to exit'
-    $null = $Host.UI.ReadLine()
+    echo 'Press any key to exit'
+    $null = $host.UI.RawUI.ReadKey()
 }

@@ -8,6 +8,7 @@ $auditBoot = (Get-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status" -Name "AuditBoo
 # Execute only when in audit mode
 if ($auditBoot -ne 0) {
     $ErrorActionPreference = "SilentlyContinue"
+	$isWin10 = (Get-WmiObject Win32_OperatingSystem).Caption -match "Windows 10"
 
     # Update UnattendFile
     reg add "HKEY_LOCAL_MACHINE\SYSTEM\Setup" /v "UnattendFile" /t REG_SZ /d "C:\ProgramData\oobe_mode.xml" /f
@@ -26,7 +27,7 @@ if ($auditBoot -ne 0) {
     if (Test-Path "$env:ProgramData\apps") {
 
         # Windows Terminal for Win10
-        if (Test-Path "$env:ProgramData\apps\Dependencies") {
+        if ($isWin10) {
             $Terminal = dir "$env:ProgramData\apps\*Terminal*.msix" | Select-Object -Exp FullName
             $UI_Xaml_8 = dir "$env:ProgramData\apps\Dependencies\*UI.Xaml_8*.msix" | Select-Object -Exp FullName
             Add-AppxProvisionedPackage -Online -SkipLic -Reg all -PackagePath $Terminal -Depend $UI_Xaml_8 | Out-Null
@@ -53,13 +54,13 @@ if ($auditBoot -ne 0) {
         rm -r -fo "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\RustDesk Tray.lnk"
     }
 
-    if ((Get-WmiObject Win32_OperatingSystem).Caption -match "Windows 11") {
+    if (!$isWin10) {
         rm -fo "$env:WINDIR\OEM\terminal_icon.ico"
     }
 }
 
 else {
     Write-Host -b black -f yellow "This script is designed to run in audit mode only."
-    echo 'Press Enter to exit'
-    $null = $Host.UI.ReadLine()
+    echo 'Press any key to exit'
+    $null = $host.UI.RawUI.ReadKey()
 }

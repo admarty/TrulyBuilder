@@ -163,37 +163,38 @@ function Main {
 
     PromptOnErrors
 
+    Write-Host ''
+    Write-Host "Copying installation files from the mounted ISO to ${tempDir}..."
     mkdir -fo $tempDir | Out-Null
-    echo "Copying installation files from the mounted ISO to ${tempDir}..."
     copy -r -fo "${drive}:\*" $tempDir | Out-Null
 
     HandleWinImageConversion
 
-    echo "Mounting the selected image: ${imageName}..."
-    echo ''
-    mkdir -fo $mntDir | Out-Null
+    Write-Host "Mounting the selected image: ${imageName}..."
+    Write-Host ''
     Set-ItemProperty "$tempDir\sources\install.wim" IsReadOnly $false
+    mkdir -fo $mntDir | Out-Null
     Mount-WindowsImage -Path $mntDir -ImagePath "$tempDir\sources\install.wim" -Name "$imageName" | Out-Null
 
     PromptOnErrors
 
     Write-Host -b black -f green 'Start removing Appx Packages...'
-    echo ''
+    Write-Host ''
     RemoveAppxPackages
 
-    echo ''
+    Write-Host ''
 
     Write-Host -b black -f green 'Start removing Windows capabilities...'
-    echo ''
+    Write-Host ''
     RemoveCapabilities
 
-    echo ''
+    Write-Host ''
 
     Write-Host -b black -f green 'Start disabling Optional Features...'
-    echo ''
+    Write-Host ''
     DisableOptionalFeatures
 
-    echo ''
+    Write-Host ''
     ModifyRegistry
 
     PromptOnErrors
@@ -203,14 +204,14 @@ function Main {
     Write-Host -b black -f green 'Import Default App Associations...'
     $AppAssociations = "$scriptRoot\res\${winver}_AppAssociations.xml"
     dism /image:$mntDir /Import-DefaultAppAssociations:$AppAssociations | Out-Null
-    echo ''
+    Write-Host ''
 
     Write-Host -b black -f green 'Transferring custom files to the image...'
-    echo ''
+    Write-Host ''
     Initialize-FilePathsForCopy
     CopyFilesIntoImage
 
-    echo ''
+    Write-Host ''
 
     attrib +h "${mntDir}\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk" | Out-Null
 
@@ -218,24 +219,24 @@ function Main {
 
     CheckPause
 
-    echo 'Unmounting and saving changes to the image...'
-    echo ''
+    Write-Host 'Unmounting and saving changes to the image...'
+    Write-Host ''
     Dismount-WindowsImage -Path $mntDir -Save -CheckIntegrity | Out-Null
     CriticalErrorAbort
 
-    echo 'Exporting Windows image...'
-    echo ''
+    Write-Host 'Exporting Windows image...'
+    Write-Host ''
     Export-WindowsImage -SourceImage "$tempDir\sources\install.wim" -DestinationImage "$tempDir\sources\install.wim.new" -SourceName "$imageName" -Compression 'max' -CheckIntegrity | Out-Null
     CriticalErrorAbort
     rm -r -fo "$tempDir\sources\install.wim"
     Rename-Item -fo "$tempDir\sources\install.wim.new" "$tempDir\sources\install.wim"
 
     Write-Host -b black -f green 'Windows Image successfully exported, proceeding to create an ISO file...'
-    echo ''
+    Write-Host ''
     copy "$scriptRoot\res\autounattend.xml" "$tempDir\autounattend.xml"
 
     CreateBootableIso
-    echo ''
+    Write-Host ''
 
     CleanupDirs
 
@@ -246,14 +247,14 @@ function Main {
 # Function to finds the mounted Windows ISO
 function FindMountedWindowsISO {
     do {
-        echo ''
+        Write-Host ''
         # Get all available drive letters in the system
         $drives = Get-Volume | Select-Object -ExpandProperty DriveLetter
 
         foreach ($driveLetter in $drives) {
             if (Test-Path "${driveLetter}:\sources\install.wim") {
                 $confirmation = Read-Host "Detected Windows ISO mounted on drive '${driveLetter}:\'. Would you like to use it? (Y/n)"
-                echo ''
+                Write-Host ''
 
                 if ($confirmation -ne 'n') {
                     $global:drive = $driveLetter
@@ -263,7 +264,7 @@ function FindMountedWindowsISO {
                 }
             } elseif (Test-Path "${driveLetter}:\sources\install.esd") {
                 $confirmation = Read-Host "Detected Windows ISO mounted on drive '${driveLetter}:\'. Would you like to use it? (Y/n)"
-                echo ''
+                Write-Host ''
 
                 if ($confirmation -ne 'n') {
                     $global:drive = $driveLetter
@@ -291,14 +292,14 @@ function SelectImageToProceed {
 
     do {
         # Display the available images
-        echo "Available Windows Images:"
-        echo ''
+        Write-Host "Available Windows Images:"
+        Write-Host ''
         foreach ($image in $windowsImages) {
-            echo "ImageIndex: $($image.ImageIndex) : $($image.ImageName)"
+            Write-Host "ImageIndex: $($image.ImageIndex) : $($image.ImageName)"
         }
-        echo ''
+        Write-Host ''
         $selectedImageIndex = Read-Host "Select an ImageIndex number to proceed"
-        echo ''
+        Write-Host ''
 
         if ($validImageIndexes -notcontains $selectedImageIndex) {
             Write-Warning "Invalid ImageIndex. Please choose a valid ImageIndex number."
@@ -332,7 +333,7 @@ function SelectImageToProceed {
 function SetISOPathAndName {
     Write-Host -b black -f cyan "The prefix '.iso' is already included."
     $isoName = Read-Host "Enter file name for the modified ISO (optional, default: ${default_isoName}_${verNum}.iso)"
-    echo ""
+    Write-Host ""
 
     if ($isoName -eq '') {
         Write-Host -b black -f cyan "Using default file name: ${default_isoName}_${verNum}.iso"
@@ -352,7 +353,7 @@ function SetISOPathAndName {
             PauseThenExit
         }
     }
-    echo ''
+    Write-Host ''
 }
 
 
@@ -367,9 +368,9 @@ function IncludeEssentialApps {
     }
 
     if (-not (gcm winget -ea si)) {
-        echo ''
+        Write-Host ''
         Write-Host -b black -f yellow "The 'winget' command is unavailable. Update 'App Installer' through Microsoft Store and then run this script again."
-        echo ''
+        Write-Host ''
         Write-Host -b black -f cyan 'Microsoft Store will open automatically in 5 seconds.'
         sleep 5
         start "ms-windows-store://pdp?hl=en-us&gl=us&productid=9nblggh4nns1"
@@ -377,9 +378,9 @@ function IncludeEssentialApps {
     }
 
     if (!(Test-Path $appsDir)) {
-        echo 'Creating apps folder...'
+        Write-Host 'Creating apps folder...'
         mkdir -fo $appsDir | Out-Null
-        echo 'Updating winget source...'
+        Write-Host 'Updating winget source...'
     } else {
         Write-Host -b black -f cyan 'Apps folder detected. Checking existing apps:'
         dir $appsDir | Select-Object Name,LastWriteTime | Format-Table -AutoSize
@@ -399,7 +400,7 @@ function IncludeEssentialApps {
             }
         }
 
-        echo ''
+        Write-Host ''
         Write-Host -b black -f cyan "Downloading $app..."
         winget download --id $app -d $appsDir --accept-package-agreements --accept-source-agreements --disable-interactivity --scope machine
     }
@@ -412,7 +413,7 @@ function IncludeEssentialApps {
 function PauseBeforeIsoCreation {
     Write-Host -b black -f cyan 'Pausing the script allows you to make additional modifications to the Windows image or insert custom files into the root directory of the ISO file before it is created.'
     $input = Read-Host 'Would you like to pause before creating the ISO file? (y/N)'
-    echo ''
+    Write-Host ''
 
     if ($input -eq 'y') {
         $global:pause = $true
@@ -427,9 +428,9 @@ function CheckPause {
         $driverFolder = Join-Path "$tempDir" '$WinPEDriver$'
         mkdir -fo $driverFolder
         Write-Host -b black -f green "The script is paused. Now you can make additional modifications. Windows image root at: '$mntDir' | ISO root at: '$tempDir'"
-        echo ''
-        Write-Host -b black -f green "Press Enter to continue when you are ready."
-        $null = $Host.UI.ReadLine()
+        Write-Host -b black -f green "Press any key to continue when you are ready."
+        $null = $host.UI.RawUI.ReadKey()
+        Write-Host ''
     }
 }
 
@@ -438,13 +439,13 @@ function CheckPause {
 function HandleWinImageConversion {
     if ($needConverter) {
         Write-Host -b black -f cyan "Converting install.esd to install.wim..."
-        echo ''
+        Write-Host ''
         Export-WindowsImage -SourceImage "$tempDir\sources\install.esd" -DestinationImage "$tempDir\sources\install.wim" -SourceName "$imageName" -Compression 'max' | Out-Null
         rm -fo "$tempDir\sources\install.esd"
     } else {
-        echo ''
+        Write-Host ''
         Write-Host -b black -f cyan "install.wim detected, conversion not needed."
-        echo ''
+        Write-Host ''
     }
 }
 
@@ -454,7 +455,7 @@ function SelectRemovalMethod {
     do {
         Write-Host -b black -f cyan "Choose a removal method: Press 1 for the 'predefined list' or 2 for 'manual selection'."
         $global:removalMethod = Read-Host "Please proceed by entering 1 or 2"
-        echo ''
+        Write-Host ''
     } while ($global:removalMethod -ne "1" -and $global:removalMethod -ne "2")
 }
 
@@ -484,7 +485,7 @@ function RemoveAppxPackages {
             if ($remove -eq 'y') {
                 Remove-AppxProvisionedPackage -PackageName $appxPackage -Path $mntDir | Out-Null
                 Write-Host -b black -f cyan "Appx package '$appxPackage' removed successfully."
-                echo ''
+                Write-Host ''
             }
         }
     }
@@ -552,7 +553,7 @@ function DisableOptionalFeatures {
             if ($disable -eq 'y') {
                 Disable-WindowsOptionalFeature -FeatureName $featureName -Path $mntDir -Remove | Out-Null
                 Write-Host -b black -f cyan "Optional Feature '$featureName' disabled successfully."
-                echo ''
+                Write-Host ''
             }
         }
     }
@@ -570,7 +571,7 @@ function ModifyRegistry {
     reg unload HKLM\zNTUSER | Out-Null
     reg unload HKLM\zSOFTWARE | Out-Null
     reg unload HKLM\zSYSTEM | Out-Null
-    echo ''
+    Write-Host ''
 }
 
 
@@ -578,7 +579,7 @@ function ModifyRegistry {
 function ModifyHostsFile {
     $path = "${mntDir}\Windows\System32\drivers\etc\hosts"
     Write-Host -b black -f green "Adding hostnames to hosts file at:  ${path}"
-    echo ''
+    Write-Host ''
     $hosts = cat $path -Raw
     foreach ($h in $hostnames) {
         if (!$hosts.Contains($h)) {
@@ -707,14 +708,14 @@ function CreateBootableIso {
 function PromptOnErrors {
     $errors = $Error.Count
     if ($errors -ne 0) {
-        echo ''
+        Write-Host ''
         Write-Host -b black -f red "There are ${errors} error(s) that occurred. If the error is not significant, you can choose whether to proceed or not."
         $confirmation = Read-Host "Do you want to continue? (Y/n)"
-        echo ''
+        Write-Host ''
         if ($confirmation -eq 'n') {
             CleanupDirs
             PauseThenExit
-            echo ''
+            Write-Host ''
         }
         $Error.Clear()
     }
@@ -725,7 +726,7 @@ function PromptOnErrors {
 function CriticalErrorAbort {
     if ($Error.Count -ne 0) {
         $Error | ForEach-Object { Write-Host -b black -f red "  $_" }
-        echo ''
+        Write-Host ''
         Write-Warning 'Something went wrong. Please try running the script again.'
         CleanupDirs
         PauseThenExit
@@ -737,30 +738,29 @@ function CriticalErrorAbort {
 function CleanupDirs {
     if (Test-Path ${mntDir}\Windows) {
         Write-Host -b black -f yellow 'Dismounting image and discarding changes...'
-        echo ''
+        Write-Host ''
         Dismount-WindowsImage -Path $mntDir -Discard | Out-Null
     }
     if (Test-Path $tempDir) {
-        echo "Cleaning up $tempDir"
+        Write-Host "Cleaning up $tempDir"
         rm -r -fo $tempDir
     }
     if (Test-Path $mntDir) {
-        echo "Cleaning up $mntDir"
+        Write-Host "Cleaning up $mntDir"
         rm -r -fo $mntDir
     }
-    echo ''
 }
 
 
 # Self-explanatory function
 function PauseThenExit {
-    echo ''
-    echo 'Operation completed. Press Enter to exit.'
-    $null = $Host.UI.ReadLine()
-
     # Clear any remaining errors and cleanup variables
     rv -fo -erroract silent -sco global *
     $Error.Clear()
+
+    Write-Host ''
+    Write-Host 'Operation completed. Press any key to exit.'
+    $null = $host.UI.RawUI.ReadKey()
     exit
 }
 
@@ -771,7 +771,7 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 
 # PauseThenExit if not running as administrator
 if (-not $isAdmin) {
-    echo ''
+    Write-Host ''
     Write-Warning 'Administrator privileges required. Please run the script with administrator.'
     PauseThenExit
 }
