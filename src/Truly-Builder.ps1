@@ -134,7 +134,6 @@ function Initialize-FilePathsForCopy {
         "$scriptRoot\src\Sysprep.ps1" = "${mntDir}\Users\Public\Desktop\"
         "$scriptRoot\res\oobe_mode_unattend.xml" = "${mntDir}\ProgramData\oobe_mode.xml"
         "$scriptRoot\res\audit_mode_unattend.xml" = "${mntDir}\ProgramData\audit_mode.xml"
-        "$scriptRoot\res\${winver}_audit_mode_tweak.reg" = "${mntDir}\ProgramData\audit_mode_tweak.reg"
         "$scriptRoot\res\${winver}_StartMenuLayouts.xml" = "$mntDir\Users\Default\AppData\Local\Microsoft\Windows\Shell\DefaultLayouts.xml"
         "$scriptRoot\res\Internet Explorer.lnk" = "${mntDir}\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\"
     }
@@ -381,7 +380,6 @@ function IncludeEssentialApps {
         echo 'Creating apps folder...'
         mkdir -fo $appsDir | Out-Null
         echo 'Updating winget source...'
-        winget source update --disable-interactivity | Out-Null
     } else {
         Write-Host -b black -f cyan 'Apps folder detected. Checking existing apps:'
         dir $appsDir | Select-Object Name,LastWriteTime | Format-Table -AutoSize
@@ -393,6 +391,7 @@ function IncludeEssentialApps {
     }
 
     rm -r -fo "$appsDir\*"
+    winget source update --disable-interactivity | Out-Null
     foreach ($app in $essentialApps) {
         if ($app -eq 'Microsoft.WindowsTerminal') {
             if ($winver -ne 'win10') {
@@ -424,12 +423,12 @@ function PauseBeforeIsoCreation {
 
 # Function to handle PauseBeforeIsoCreation
 function CheckPause {
-    if ($pause -eq $true) {
+    if ($pause) {
         $driverFolder = Join-Path "$tempDir" '$WinPEDriver$'
         mkdir -fo $driverFolder
-        Write-Host -b black -f cyan "The script is paused. Now you can make additional modifications. Windows image root at: $mntDir | ISO root at: $tempDir"
+        Write-Host -b black -f green "The script is paused. Now you can make additional modifications. Windows image root at: '$mntDir' | ISO root at: '$tempDir'"
         echo ''
-        Write-Host -b black -f cyan "Press Enter to continue when you are ready."
+        Write-Host -b black -f green "Press Enter to continue when you are ready."
         $null = $Host.UI.ReadLine()
     }
 }

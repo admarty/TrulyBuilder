@@ -229,3 +229,95 @@ Windows Registry Editor Version 5.00
   00,44,00,61,00,74,00,61,00,5c,00,61,00,75,00,64,00,69,00,74,00,5f,00,6d,00,\
   6f,00,64,00,65,00,2e,00,78,00,6d,00,6c,00,00,00
 
+; Disable BitLocker automatic device encryption
+[HKEY_LOCAL_MACHINE\zSYSTEM\ControlSet001\Control\BitLocker]
+"PreventDeviceEncryption"=dword:00000001
+
+; Turn off Offline File
+[HKEY_LOCAL_MACHINE\zSYSTEM\ControlSet001\Services\CSC]
+"Start"=dword:00000004
+[HKEY_LOCAL_MACHINE\zSYSTEM\ControlSet001\Services\CscService]
+"Start"=dword:00000004
+
+; Do not use UTC for real-time clock
+[HKEY_LOCAL_MACHINE\zSYSTEM\ControlSet001\Control\TimeZoneInformation]
+"RealTimeIsUniversal"=dword:00000000
+
+; Disable DiagTrack service
+[HKEY_LOCAL_MACHINE\zSYSTEM\ControlSet001\Services\DiagTrack]
+"Start"=dword:00000003
+
+
+; Essential Windows 11 shift + right-click context menu
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\w11_context_menu_switch]
+"icon"="explorer.exe"
+"MUIVerb"="Right-click context menu switcher"
+"NoWorkingDirectory"=""
+"Position"="Bottom"
+"Extended"=""
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\w11_context_menu_switch\command]
+@="conhost cmd /c reg query HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2} && reg delete HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2} /f || (reg add HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32 && taskkill /f /im explorer.exe && start explorer.exe)"
+
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\restart_explorer]
+"icon"="explorer.exe"
+"MUIVerb"="Restart Explorer"
+"NoWorkingDirectory"=""
+"Position"="Bottom"
+"Extended"=""
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\restart_explorer\command]
+@="conhost cmd /c taskkill /f /im explorer.exe & start explorer.exe"
+
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\control_panel]
+"MUIVerb"="Open Control Panel"
+"NoWorkingDirectory"=""
+"Extended"=""
+"Icon"="control.exe"
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\control_panel\command]
+@="control"
+
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\network_adapter]
+"MUIVerb"="View Network Connections"
+"NoWorkingDirectory"=""
+"Extended"=""
+"Icon"="ncpa.cpl"
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\network_adapter\command]
+@="control ncpa.cpl"
+
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\realtime_protection_switch]
+"MUIVerb"="Real-time Protection switch"
+"NoWorkingDirectory"=""
+"Extended"=""
+"Icon"="\"%ProgramFiles%\\Windows Defender\\Offline\\OfflineScannerShell.exe\""
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Directory\background\shell\realtime_protection_switch\command]
+@="wscript \"C:\\Windows\\OEM\\Run_as_Administrator.vbs\""
+
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\*\shell\duplicate]
+"Icon"="%windir%\\OEM\\duplicate_icon.ico"
+"MUIVerb"="Duplicate this file"
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\*\shell\duplicate\command]
+@="conhost cmd /Q /V:ON /E:ON /C \"set TIME=%%TIME: =0%%&set TimeFn=!TIME:~0,2!-!TIME:~3,2!-!TIME:~6,2!&FOR %%G IN (\"%1\") do copy \"%1\" \"%%~nG_!TimeFn!%%~xG\">nul 2>&1\""
+
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Drive\shell\disk_cleanup]
+"MUIVerb"="Disk Cleanup"
+"Icon"="cleanmgr.exe"
+"NoWorkingDirectory"=""
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\Drive\shell\disk_cleanup\command]
+@="cleanmgr /d %1"
+
+
+[HKEY_LOCAL_MACHINE\zSOFTWARE\Classes\AllFilesystemObjects\shellex\ContextMenuHandlers\CopyTo]
+@="{C2FBB630-2971-11D1-A18C-00C04FD75D13}"
