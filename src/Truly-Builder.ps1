@@ -356,7 +356,7 @@ function IncludeEssentialApps {
     $appsDir = "${scriptRoot}\apps"
     Initialize-FilePathsForCopy
 
-    $global:includeApps = Read-Host "Do you want to include essential apps like Chrome, Notepad++, 7-Zip, and RustDesk? (Y/n)"
+    $includeApps = Read-Host "Do you want to include essential apps like Chrome, Notepad++, 7-Zip, and RustDesk? (Y/n)"
     if ($includeApps -eq 'n') {
         Write-Host -b black -f cyan 'Skipping installation of essential apps.'
         return
@@ -581,7 +581,7 @@ function ModifyHostsFile {
 
 # Self-explanatory function
 function CopyFilesIntoImage {
-    foreach ($filePath in $global:filePaths.GetEnumerator()) {
+    foreach ($filePath in $filePaths.GetEnumerator()) {
         $sourcePath = $filePath.Key
         $destinationPath = $filePath.Value
 
@@ -746,12 +746,16 @@ function PauseThenExit {
     # Clear any remaining errors and cleanup variables
     rv -fo -sco global *
     $Error.Clear()
-    
+
     Write-Host ''
     Write-Host 'Operation completed. Press any key to exit.'
     $null = $host.UI.RawUI.ReadKey()
     exit
 }
+
+$Error.Clear()
+$ErrorActionPreference = "SilentlyContinue"
+$scriptRoot = Split-Path $PSScriptRoot -Parent
 
 clear
 
@@ -764,10 +768,6 @@ if (!($isAdmin)) {
     Write-Warning 'Administrator privileges required. Please run the script with administrator.'
     PauseThenExit
 }
-
-$Error.Clear()
-$ErrorActionPreference = "SilentlyContinue"
-$scriptRoot = Split-Path $PSScriptRoot -Parent
 
 # Execute the main function of the script
 Main
