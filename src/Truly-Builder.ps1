@@ -19,7 +19,6 @@ $default_isoName = '0.1_Truly' # The prefix '.iso' is already included
 $isoLabel = 'DVD_ROM'
 $tempDir = "${env:SystemDrive}\Truly-Builder_temp"
 $mntDir = "${env:SystemDrive}\Truly-Builder_mount"
-$scriptRoot = Split-Path $PSScriptRoot -Parent
 
 # Predefined list of Appx Packages to remove (modify as needed)
 $predefinedAppxPackages = @(
@@ -110,11 +109,11 @@ $predefinedOptionalFeatures = @(
 
 # Hostnames to be added to the hosts file (modify as needed)
 $hostnames = @(
-    # Diagnostic Data
-    'functional.events.data.microsoft.com',
-    'browser.events.data.msn.com',
-    'self.events.data.microsoft.com',
-    'v10.events.data.microsoft.com'
+    '# Diagnostic Data'
+    '0.0.0.0 functional.events.data.microsoft.com',
+    '0.0.0.0 browser.events.data.msn.com',
+    '0.0.0.0 self.events.data.microsoft.com',
+    '0.0.0.0 v10.events.data.microsoft.com'
 )
 
 # Define a list of Winget app IDs to be installed with the audit_script. Modify as needed, and don't forget to update the audit_script accordingly.
@@ -136,10 +135,6 @@ function Initialize-FilePathsForCopy {
         "$scriptRoot\res\audit_mode_unattend.xml" = "${mntDir}\ProgramData\audit_mode.xml"
         "$scriptRoot\res\${winver}_StartMenuLayouts.xml" = "$mntDir\Users\Default\AppData\Local\Microsoft\Windows\Shell\DefaultLayouts.xml"
         "$scriptRoot\res\Internet Explorer.lnk" = "${mntDir}\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\"
-    }
-
-    if ($includeApps -ne 'n') {
-        $filePaths["$scriptRoot\apps"] = "${mntDir}\ProgramData\"
     }
 }
 
@@ -167,6 +162,7 @@ function Main {
     Write-Host "Copying installation files from the mounted ISO to ${tempDir}..."
     mkdir -fo $tempDir | Out-Null
     copy -r -fo "${drive}:\*" $tempDir | Out-Null
+    Write-Host ''
 
     HandleWinImageConversion
 
@@ -208,7 +204,6 @@ function Main {
 
     Write-Host -b black -f green 'Transferring custom files to the image...'
     Write-Host ''
-    Initialize-FilePathsForCopy
     CopyFilesIntoImage
 
     Write-Host ''
@@ -269,18 +264,17 @@ function FindMountedWindowsISO {
                 if ($confirmation -ne 'n') {
                     $global:drive = $driveLetter
                     $global:imageFormat = 'esd'
-                    $global:needConverter = $true
                     $found = $true
                     break
                 }
             }
         }
 
-        if (-not $found) {
+        if (!($found)) {
             Write-Warning 'Please mount the Windows ISO file, and then press Enter to check again.'
             $null = Read-Host
         }
-    } while (-not $found)
+    } while (!($found))
 }
 
 
@@ -360,14 +354,17 @@ function SetISOPathAndName {
 # Function prompts the user to confirm whether essential apps are needed
 function IncludeEssentialApps {
     $appsDir = "${scriptRoot}\apps"
+    Initialize-FilePathsForCopy
 
     $global:includeApps = Read-Host "Do you want to include essential apps like Chrome, Notepad++, 7-Zip, and RustDesk? (Y/n)"
     if ($includeApps -eq 'n') {
         Write-Host -b black -f cyan 'Skipping installation of essential apps.'
         return
+    } else {
+        $global:filePaths["$appsDir"] = "${mntDir}\ProgramData\"
     }
 
-    if (-not (gcm winget -ea si)) {
+    if (!(gcm winget)) {
         Write-Host ''
         Write-Host -b black -f yellow "The 'winget' command is unavailable. Update 'App Installer' through Microsoft Store and then run this script again."
         Write-Host ''
@@ -380,7 +377,6 @@ function IncludeEssentialApps {
     if (!(Test-Path $appsDir)) {
         Write-Host 'Creating apps folder...'
         mkdir -fo $appsDir | Out-Null
-        Write-Host 'Updating winget source...'
     } else {
         Write-Host -b black -f cyan 'Apps folder detected. Checking existing apps:'
         dir $appsDir | Select-Object Name,LastWriteTime | Format-Table -AutoSize
@@ -392,6 +388,7 @@ function IncludeEssentialApps {
     }
 
     rm -r -fo "$appsDir\*"
+    Write-Host 'Updating winget source...'
     winget source update --disable-interactivity | Out-Null
     foreach ($app in $essentialApps) {
         if ($app -eq 'Microsoft.WindowsTerminal') {
@@ -426,7 +423,7 @@ function PauseBeforeIsoCreation {
 function CheckPause {
     if ($pause) {
         $driverFolder = Join-Path "$tempDir" '$WinPEDriver$'
-        mkdir -fo $driverFolder
+        mkdir -fo $driverFolder | Out-Null
         Write-Host -b black -f green "The script is paused. Now you can make additional modifications. Windows image root at: '$mntDir' | ISO root at: '$tempDir'"
         Write-Host -b black -f green "Press any key to continue when you are ready."
         $null = $host.UI.RawUI.ReadKey()
@@ -437,15 +434,11 @@ function CheckPause {
 
 # Function to convert install.esd to install.wim when necessary
 function HandleWinImageConversion {
-    if ($needConverter) {
+    if ($imageFormat -eq 'esd') {
         Write-Host -b black -f cyan "Converting install.esd to install.wim..."
         Write-Host ''
         Export-WindowsImage -SourceImage "$tempDir\sources\install.esd" -DestinationImage "$tempDir\sources\install.wim" -SourceName "$imageName" -Compression 'max' | Out-Null
         rm -fo "$tempDir\sources\install.esd"
-    } else {
-        Write-Host ''
-        Write-Host -b black -f cyan "install.wim detected, conversion not needed."
-        Write-Host ''
     }
 }
 
@@ -580,13 +573,9 @@ function ModifyHostsFile {
     $path = "${mntDir}\Windows\System32\drivers\etc\hosts"
     Write-Host -b black -f green "Adding hostnames to hosts file at:  ${path}"
     Write-Host ''
-    $hosts = cat $path -Raw
-    foreach ($h in $hostnames) {
-        if (!$hosts.Contains($h)) {
-            $hosts += "0.0.0.0 ${h}`r`n"
-        }
-    }
-    Out-File -FilePath $path -InputObject $hosts -Encoding utf8
+    $hosts = Get-Content $path -Raw
+    $hosts += $hostnames -join "`r`n"
+    $hosts | Set-Content -Path $path -Encoding utf8
 }
 
 
@@ -755,28 +744,30 @@ function CleanupDirs {
 # Self-explanatory function
 function PauseThenExit {
     # Clear any remaining errors and cleanup variables
-    rv -fo -erroract silent -sco global *
+    rv -fo -sco global *
     $Error.Clear()
-
+    
     Write-Host ''
     Write-Host 'Operation completed. Press any key to exit.'
     $null = $host.UI.RawUI.ReadKey()
     exit
 }
 
-cls
+clear
 
 # Check if the script is running with administrator privileges
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 # PauseThenExit if not running as administrator
-if (-not $isAdmin) {
+if (!($isAdmin)) {
     Write-Host ''
     Write-Warning 'Administrator privileges required. Please run the script with administrator.'
     PauseThenExit
 }
 
 $Error.Clear()
+$ErrorActionPreference = "SilentlyContinue"
+$scriptRoot = Split-Path $PSScriptRoot -Parent
 
 # Execute the main function of the script
 Main
