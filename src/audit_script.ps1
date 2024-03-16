@@ -8,7 +8,7 @@ $auditBoot = (Get-ItemProperty -Path "HKLM:\SYSTEM\Setup\Status" -Name "AuditBoo
 # Execute only when in audit mode
 if ($auditBoot -ne 0) {
     $ErrorActionPreference = "SilentlyContinue"
-	$isWin10 = (Get-WmiObject Win32_OperatingSystem).Caption -match "Windows 10"
+    $isWin10 = (Get-WmiObject Win32_OperatingSystem).Caption -match "Windows 10"
 
     # Update UnattendFile
     reg add "HKEY_LOCAL_MACHINE\SYSTEM\Setup" /v "UnattendFile" /t REG_SZ /d "C:\ProgramData\oobe_mode.xml" /f
